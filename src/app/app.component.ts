@@ -19,12 +19,23 @@ export class AppComponent implements AfterViewInit {
   ];
 
 
-  currentValue: Date = new Date('4/21/2020, 12:00 AM');
-  endValue: Date = new Date('4/21/2020, 11:59 PM');
+  /* currentValue: Date = new Date('4/21/2020, 12:00 AM');
+  endValue: Date = new Date('4/21/2020, 11:59 PM'); */
+
+  currentValue: Date = new Date('12/21/2021, 12:00 AM');
+  endValue: Date = new Date();
+
+  dateClasses = []
+  show: boolean = false;
 
   open_once = false;
 
   ngAfterViewInit() {
+    this.addDateClasses();
+  }
+
+  addDateClasses() {
+    this.dateClasses = [{date: moment().startOf('day').toDate(), classes: ['bold']}];
   }
 
   selectedTrigger(_date) {

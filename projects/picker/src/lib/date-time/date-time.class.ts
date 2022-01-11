@@ -26,6 +26,11 @@ export enum DateView {
     MULTI_YEARS = 'multi-years'
 }
 
+export type DateClasses = {
+    date: Date,
+    classes: string[]
+};
+
 export type DateViewType = DateView.MONTH | DateView.YEAR | DateView.MULTI_YEARS;
 
 @Directive()
@@ -167,6 +172,8 @@ export abstract class OwlDateTime<T> {
     abstract get endAt(): T | null;
 
     abstract get opened(): boolean;
+
+    abstract get dateClasses(): DateClasses[];
 
     abstract get pickerMode(): PickerMode;
 

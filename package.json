@@ -1,6 +1,6 @@
 {
-  "name": "@danielmoncada/angular-datetime-picker",
-  "version": "13.0.0",
+  "name": "@deepuppeds/angular-datetime-picker",
+  "version": "13.1.5",
   "description": "Angular Date Time Picker",
   "keywords": [
     "Angular",
@@ -27,6 +27,8 @@
     "build_css_onWindows": "mkdir \"dist/picker/assets/style\" && node-sass --output-style=compressed projects/picker/src/sass/picker.scss > dist/picker/assets/style/picker.min.css",
     "build_css_onLinux": "mkdir -p dist/picker/assets/style && node-sass --output-style=compressed projects/picker/src/sass/picker.scss > dist/picker/assets/style/picker.min.css",
     "npm_pack": "cd dist/picker && npm pack",
+    "npm_publish": "cd dist/picker && npm publish --access public",
+    "package_mac": "npm run build_lib && npm run npm_pack",
     "package_windows": "npm run build_lib && npm run build_css_onWindows && npm run npm_pack",
     "package_linux": "npm run build_lib && npm run build_css_onLinux && npm run npm_pack"
   },

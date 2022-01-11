@@ -17,6 +17,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import {
+    DateClasses,
     OwlDateTime,
     PickerMode,
     PickerType,
@@ -264,6 +265,17 @@ export class OwlDateTimeInlineComponent<T> extends OwlDateTime<T>
 
     get opened(): boolean {
         return true;
+    }
+
+    /** Date custom classes. */
+    private _dateClasses: DateClasses[] = [];
+    @Input()
+    get dateClasses(): DateClasses[] {
+        return this._dateClasses;
+    }
+
+    set dateClasses(classes: DateClasses[]) {
+        this.container.dateClasses = classes;
     }
 
     get pickerMode(): PickerMode {

@@ -26,7 +26,7 @@ import {
     OwlDateTimeFormats
 } from './adapter/date-time-format.class';
 import { Subscription } from 'rxjs';
-import { SelectMode } from './date-time.class';
+import { DateClasses, SelectMode } from './date-time.class';
 import {
     DOWN_ARROW,
     END,
@@ -173,6 +173,21 @@ export class OwlMonthViewComponent<T>
 
     set dateFilter(filter: (date: T) => boolean) {
         this._dateFilter = filter;
+        if (this.initiated) {
+            this.generateCalendar();
+            this.cdRef.markForCheck();
+        }
+    }
+
+    // set date classes
+    private _dateClasses: DateClasses[] = [];
+    @Input()
+    get dateClasses(): DateClasses[] {
+        return this._dateClasses;
+    }
+
+    set dateClasses(classes: DateClasses[]) {
+        this._dateClasses = classes;
         if (this.initiated) {
             this.generateCalendar();
             this.cdRef.markForCheck();
@@ -563,7 +578,17 @@ export class OwlMonthViewComponent<T>
         // check if date is not in current month
         const dayValue = daysDiff + 1;
         const out = dayValue < 1 || dayValue > daysInMonth;
-        const cellClass = 'owl-dt-day-' + this.dateTimeAdapter.getDay(date);
+        let cellClass = 'owl-dt-day-' + this.dateTimeAdapter.getDay(date);
+        
+        // add classes
+        if(this._dateClasses.length) {
+            let foundClass = this._dateClasses.find(_dc => _dc.date.toDateString() == new Date(date.toString()).toDateString());
+            if(foundClass) {
+                foundClass.classes.forEach(_cname => {
+                    cellClass += ` owl-dt-extra-${_cname}`;
+                })
+            }
+        }
 
         return new CalendarCell(
             dayValue,
