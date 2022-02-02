@@ -18,7 +18,7 @@ import { OwlDateTimeIntl } from './date-time-picker-intl.service';
 import { OwlCalendarComponent } from './calendar.component';
 import { OwlTimerComponent } from './timer.component';
 import { DateTimeAdapter } from './adapter/date-time-adapter.class';
-import { DateClasses, OwlDateTime, PickerType } from './date-time.class';
+import { ActiveDates, DateClasses, OwlDateTime, PickerType } from './date-time.class';
 import { Observable, Subject } from 'rxjs';
 import { owlDateTimePickerAnimations } from './date-time-picker.animations';
 import {
@@ -210,6 +210,18 @@ export class OwlDateTimeContainerComponent<T>
     set dateClasses(classes: DateClasses[]) {
         this._dateClasses = classes;
         if(classes.length)
+            this.pickerIntl.changes.next();
+    }
+
+    /** Active Dates. */
+    private _activeDates: ActiveDates[] = [];
+    get activeDates(): ActiveDates[] {
+        return this._activeDates;
+    }
+
+    set activeDates(dates: ActiveDates[]) {
+        this._activeDates = dates;
+        if(dates.length)
             this.pickerIntl.changes.next();
     }
 

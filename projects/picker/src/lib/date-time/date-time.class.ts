@@ -31,6 +31,8 @@ export type DateClasses = {
     classes: string[]
 };
 
+export type ActiveDates = Date;
+
 export type DateViewType = DateView.MONTH | DateView.YEAR | DateView.MULTI_YEARS;
 
 @Directive()
@@ -174,6 +176,8 @@ export abstract class OwlDateTime<T> {
     abstract get opened(): boolean;
 
     abstract get dateClasses(): DateClasses[];
+
+    abstract get activeDates(): ActiveDates[];
 
     abstract get pickerMode(): PickerMode;
 

@@ -26,7 +26,7 @@ import {
     OwlDateTimeFormats
 } from './adapter/date-time-format.class';
 import { Subscription } from 'rxjs';
-import { DateClasses, SelectMode } from './date-time.class';
+import { DateClasses, ActiveDates, SelectMode } from './date-time.class';
 import {
     DOWN_ARROW,
     END,
@@ -188,6 +188,21 @@ export class OwlMonthViewComponent<T>
 
     set dateClasses(classes: DateClasses[]) {
         this._dateClasses = classes;
+        if (this.initiated) {
+            this.generateCalendar();
+            this.cdRef.markForCheck();
+        }
+    }
+
+    // set active dates
+    private _activeDates: ActiveDates[] = [];
+    @Input()
+    get activeDates(): ActiveDates[] {
+        return this._activeDates;
+    }
+
+    set activeDates(dates: ActiveDates[]) {
+        this._activeDates = dates;
         if (this.initiated) {
             this.generateCalendar();
             this.cdRef.markForCheck();
@@ -604,13 +619,17 @@ export class OwlMonthViewComponent<T>
      * Check if the date is valid
      */
     private isDateEnabled(date: T): boolean {
+        let dateString = new Date(date.toString()).toDateString();
+        let activeDates = (this.activeDates) ? this.activeDates.map(_date => _date.toDateString()) : [];
+        
         return (
             !!date &&
             (!this.dateFilter || this.dateFilter(date)) &&
             (!this.minDate ||
                 this.dateTimeAdapter.compare(date, this.minDate) >= 0) &&
             (!this.maxDate ||
-                this.dateTimeAdapter.compare(date, this.maxDate) <= 0)
+                this.dateTimeAdapter.compare(date, this.maxDate) <= 0) &&
+            (!activeDates || activeDates.includes(dateString))
         );
     }
 

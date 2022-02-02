@@ -21,7 +21,7 @@ import {
 import {OwlDateTimeIntl} from './date-time-picker-intl.service';
 import {DateTimeAdapter} from './adapter/date-time-adapter.class';
 import {OWL_DATE_TIME_FORMATS, OwlDateTimeFormats} from './adapter/date-time-format.class';
-import {DateClasses, DateView, DateViewType, SelectMode} from './date-time.class';
+import {ActiveDates, DateClasses, DateView, DateViewType, SelectMode} from './date-time.class';
 import {take} from 'rxjs/operators';
 import {Subscription} from 'rxjs';
 
@@ -119,6 +119,17 @@ export class OwlCalendarComponent<T>
 
     set dateClasses(classes: DateClasses[]) {
         this._dateClasses = classes;
+    }
+
+    // set active dates
+    private _activeDates: ActiveDates[] = [];
+    @Input()
+    get activeDates(): ActiveDates[] {
+        return this._activeDates;
+    }
+
+    set activeDates(dates: ActiveDates[]) {
+        this._activeDates = dates;
     }
 
     get periodButtonText(): string {

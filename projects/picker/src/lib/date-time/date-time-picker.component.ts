@@ -38,6 +38,7 @@ import {
     OwlDateTimeFormats
 } from './adapter/date-time-format.class';
 import {
+    ActiveDates,
     DateClasses,
     OwlDateTime,
     PickerMode,
@@ -222,6 +223,17 @@ export class OwlDateTimeComponent<T> extends OwlDateTime<T>
 
     set dateClasses(classes: DateClasses[]) {
         this._dateClasses = classes;
+    }
+
+    /** Date custom classes. */
+    private _activeDates: ActiveDates[] = [];
+    @Input()
+    get activeDates(): ActiveDates[] {
+        return this._activeDates;
+    }
+
+    set activeDates(dates: ActiveDates[]) {
+        this._activeDates = dates;
     }
 
     /**
@@ -598,6 +610,7 @@ export class OwlDateTimeComponent<T> extends OwlDateTime<T>
         );
         this.pickerContainer = this.dialogRef.componentInstance;
         this.pickerContainer.dateClasses = this.dateClasses;
+        this.pickerContainer.activeDates = this.activeDates;
 
         this.dialogRef.afterOpen().subscribe(() => {
             this.afterPickerOpen.emit(null);
@@ -626,6 +639,7 @@ export class OwlDateTimeComponent<T> extends OwlDateTime<T>
             > = this.popupRef.attach(this.pickerContainerPortal);
             this.pickerContainer = componentRef.instance;
             this.pickerContainer.dateClasses = this.dateClasses;
+            this.pickerContainer.activeDates = this.activeDates;
 
             // Update the position once the calendar has rendered.
             this.ngZone.onStable

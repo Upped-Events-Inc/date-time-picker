@@ -6,4 +6,4 @@
 <owl-date-time #date_range_component [startAt]="currentValue" [endAt]="endValue" [dateClasses]="dateClasses" (afterPickerClosed)="selectedTrigger($event)" (dateSelected)="selectedTrigger($event)"></owl-date-time> -->
 
 
-<owl-date-time-inline [pickerType]="'calendar'" [dateClasses]="dateClasses" [startAt]="currentValue" [endAt]="endValue"></owl-date-time-inline>
+<owl-date-time-inline [pickerType]="'calendar'" [dateClasses]="dateClasses" [activeDates]="activeDates" [startAt]="currentValue" [endAt]="endValue"></owl-date-time-inline>
