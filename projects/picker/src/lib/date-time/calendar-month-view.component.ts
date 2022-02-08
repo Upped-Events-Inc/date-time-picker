@@ -629,7 +629,7 @@ export class OwlMonthViewComponent<T>
                 this.dateTimeAdapter.compare(date, this.minDate) >= 0) &&
             (!this.maxDate ||
                 this.dateTimeAdapter.compare(date, this.maxDate) <= 0) &&
-            (!activeDates || activeDates.includes(dateString))
+            (!activeDates.length || activeDates.includes(dateString))
         );
     }
 
