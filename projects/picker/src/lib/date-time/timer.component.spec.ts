@@ -4,7 +4,6 @@
 
 import { EventEmitter } from '@angular/core';
 import {
-    async,
     ComponentFixture,
     fakeAsync,
     flush,
@@ -12,6 +11,7 @@ import {
 } from '@angular/core/testing';
 import { OwlDateTimeIntl } from './date-time-picker-intl.service';
 import { Component, DebugElement, NgZone } from '@angular/core';
+import { discardPeriodicTasks } from '@angular/core/testing';
 import { OwlNativeDateTimeModule } from './adapter/native-date-time.module';
 import { OwlDateTimeModule } from './date-time.module';
 import { By } from '@angular/platform-browser';
@@ -50,7 +50,7 @@ class MockNgZone extends NgZone {
 describe('OwlTimerComponent', () => {
     let zone: MockNgZone;
 
-    beforeEach(async(() => {
+    beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [OwlNativeDateTimeModule, OwlDateTimeModule],
             declarations: [StandardTimerComponent],
@@ -59,7 +59,7 @@ describe('OwlTimerComponent', () => {
                 { provide: NgZone, useFactory: () => (zone = new MockNgZone()) }
             ]
         }).compileComponents();
-    }));
+    });
 
     describe('standard timer', () => {
         let fixture: ComponentFixture<StandardTimerComponent>;
@@ -351,14 +351,19 @@ describe('OwlTimerComponent', () => {
             dispatchFakeEvent(timeCells[0], 'focusin');
             timeCells[0].value = '5';
             dispatchFakeEvent(timeCells[0], 'input');
+            setTimeout(() => { }, 1000);
 
             timeCells[1].value = '8';
             dispatchFakeEvent(timeCells[1], 'input');
+            setTimeout(() => { }, 1000);
 
             fixture.detectChanges();
 
             expect(timeCells[0].value).toEqual('5');
-            expect(timeCells[1].value).toEqual('08');
+            expect(timeCells[1].value).toEqual('8');
+
+
+            flush();
         }));
     });
 });

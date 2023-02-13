@@ -1,6 +1,6 @@
 {
-  "name": "@deepuppeds/angular-datetime-picker",
-  "version": "13.1.10",
+  "name": "@deepuppeds/ng-datetime-picker",
+  "version": "15.0.3",
   "description": "Angular Date Time Picker",
   "keywords": [
     "Angular",
@@ -24,12 +24,16 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@angular/common": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0 || ^12.0.0 || ^13.0.0",
-    "@angular/core": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0 || ^12.0.0 || ^13.0.0",
-    "@angular/cdk": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0 || ^12.0.0 || ^13.0.0",
-    "moment": "^2.29.1"
+    "@angular/common": "^13.0.3 || ^14.0.0 || ^15.0.0",
+    "@angular/core": "^13.0.3 || ^14.0.0 || ^15.0.0",
+    "@angular/cdk": "^13.0.3 || ^14.0.0 || ^15.0.0"
   },
   "dependencies": {
-    "tslib": "^2.0.0"
+    "tslib": "^2.3.1"
+  },
+  "exports": {
+    "./assets/style/picker.min.css": {
+      "default":  "./assets/style/picker.min.css"
+    }
   }
 }
