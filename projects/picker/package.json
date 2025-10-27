@@ -1,6 +1,6 @@
 {
   "name": "@upped-events-inc/ng-datetime-picker",
-  "version": "15.0.3",
+  "version": "15.0.4",
   "description": "Angular Date Time Picker",
   "keywords": [
     "Angular",
@@ -33,7 +33,7 @@
   },
   "exports": {
     "./assets/style/picker.min.css": {
-      "default":  "./assets/style/picker.min.css"
+      "default": "./assets/style/picker.min.css"
     }
   }
 }
