@@ -1,0 +1,161 @@
+name: Validate and Publish Package
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'projects/picker/src/**'
+      - 'package.json'
+
+jobs:
+  validate-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Needed for Nx affected commands and versioning
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@upped-events-inc'
+      
+      - name: Install dependencies
+        run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      # Configure Git early so we can commit index files
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+
+      # Update package version based on branch
+      - name: Update package version for branch
+        run: node scripts/version-helper.js update
+
+      # Validate that version is correct for the branch
+      - name: Validate version for branch
+        run: node scripts/version-helper.js validate
+
+      # Safely bump version based on conventional commits
+      - name: Safe version bump based on commits
+        run: node scripts/safe-version-bump.js bump
+
+      # Validate the final version is still correct
+      - name: Validate final version after bump
+        run: node scripts/version-helper.js validate
+
+      # Generate changelog and create git tag
+      - name: Generate changelog and tag
+        run: node scripts/changelog-generator.js generate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Push version changes and tags
+        run: |
+          # Ensure version changes are pushed
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "Committing version changes"
+            git add .
+            git commit -m "chore(release): version bump [skip ci]"
+          fi
+          git push origin ${{ github.ref_name }} --follow-tags --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Build package
+        run: npm run npm:build
+        
+      - name: Pack package
+        run: npm run npm:pack
+        
+      - name: Verify build output
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "Error: dist directory was not created during build"
+            exit 1
+          fi
+          echo "Build output:"
+          find dist -type f | sort
+
+      - name: Publish package
+        run: npm run npm:publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # After the version has been updated and package published
+      - name: Extract changelog and version
+        id: extract_info
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          BRANCH_NAME=${{ github.ref_name }}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_ENV
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+          
+          # Extract commits from CHANGELOG.md
+          if [ -f "CHANGELOG.md" ]; then
+            # Extract the content between the current version header and the next version header
+            CHANGELOG_CONTENT=$(awk -v ver="## [${VERSION}]" '
+              $0 ~ ver {flag=1; next}
+              /^## \[/ {if (flag) flag=0}
+              flag {print}
+            ' CHANGELOG.md)
+            
+            # Escape newlines for GitHub Actions
+            CHANGELOG_CONTENT="${CHANGELOG_CONTENT//'%'/'%25'}"
+            CHANGELOG_CONTENT="${CHANGELOG_CONTENT//$'\n'/'%0A'}"
+            CHANGELOG_CONTENT="${CHANGELOG_CONTENT//$'\r'/'%0D'}"
+            echo "CHANGELOG_CONTENT<<EOF" >> $GITHUB_ENV
+            echo "$CHANGELOG_CONTENT" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+          else
+            echo "CHANGELOG_CONTENT=No changelog found" >> $GITHUB_ENV
+          fi
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.BRANCH_NAME }}-v${{ env.VERSION }}
+          name: Release ${{ env.PACKAGE_NAME }}@${{ env.VERSION }}
+          body: |
+            ## What's Changed
+            ${{ env.CHANGELOG_CONTENT }}
+
+            ## Package Information
+            This release is published as a GitHub Package:
+            - **Package Name**: `${{ env.PACKAGE_NAME }}`
+            - **Version**: v${{ env.VERSION }}
+            - **Branch**: ${{ env.BRANCH_NAME }}
+            - **Angular Version**: ${{ env.BRANCH_NAME == 'main' && '19.x' }}
+            - **Registry**: [GitHub Packages](https://github.com/Upped-Events-Inc/common/packages)
+            
+            ### Installation
+            ```bash
+            npm install ${{ env.PACKAGE_NAME }}@${{ env.VERSION }}
+            ```
+            
+            Or add to your package.json:
+            ```json
+            "devDependencies": {
+              "${{ env.PACKAGE_NAME }}": "^${{ env.VERSION }}"
+            }
+            ```
+
+            ### Angular Compatibility
+            ${{ env.BRANCH_NAME == 'main' && '- ✅ Angular 19.x projects' }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
